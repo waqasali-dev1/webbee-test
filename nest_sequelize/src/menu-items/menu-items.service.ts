@@ -84,6 +84,16 @@ export class MenuItemsService {
     ]
   */
   async getMenuItems() {
-    throw new Error('TODO in task 3');
+    return await this.menuItemRepository.findAll({
+        include: [
+            {
+                model: this.menuItemRepository,
+                include: [this.menuItemRepository]
+            }
+        ],
+        where: {
+            parentId: null
+        }
+    })
   }
 }
