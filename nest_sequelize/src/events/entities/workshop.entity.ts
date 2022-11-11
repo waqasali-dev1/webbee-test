@@ -4,9 +4,12 @@ import {
   Model,
   AutoIncrement,
   PrimaryKey,
+  BelongsTo,
+  ForeignKey
 } from 'sequelize-typescript';
 import { ModelAttributeColumnOptions } from 'sequelize';
 import { Injectable } from '@nestjs/common';
+import Event from './event.entity';
 
 @Injectable()
 @Table
@@ -22,6 +25,7 @@ export default class Workshop extends Model {
   @Column({ type: 'datetime' } as ModelAttributeColumnOptions)
   end: string;
 
+  @ForeignKey(() => Event)
   @Column({
     type: 'integer',
     defaultValue: null,
@@ -31,6 +35,9 @@ export default class Workshop extends Model {
   @Column
   name: string;
 
+  @BelongsTo(() => Event)
+  event:Event;
+  
   @Column({ type: 'datetime' } as ModelAttributeColumnOptions)
   createdAt: string;
 }

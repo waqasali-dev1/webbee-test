@@ -1,12 +1,16 @@
 import { Get, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import Event from './entities/event.entity';
+import Workshop from './entities/workshop.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectModel(Event)
     private eventRepository: typeof Event,
+    @InjectModel(Workshop)
+    private eventWorkshop: typeof Workshop,
   ) {}
 
   getWarmupEvents() {
@@ -92,7 +96,18 @@ export class EventsService {
 
   @Get('events')
   async getEventsWithWorkshops() {
-    throw new Error('TODO task 1');
+    return await this.eventRepository.findAll({
+      attributes: ['id', 'name', 'createdAt'],
+      include: [
+        {
+          model: this.eventWorkshop,
+          attributes: ['id', 'start', 'end', 'eventId', 'name', 'createdAt'],
+        }
+      ],
+      order: [
+        ['workshops', 'id', 'asc']
+      ]
+    })
   }
 
   /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
@@ -163,6 +178,22 @@ export class EventsService {
      */
   @Get('futureevents')
   async getFutureEventWithWorkshops() {
-    throw new Error('TODO task 2');
+    const startDate = new Date();
+    return await this.eventRepository.findAll({
+      attributes: ['id', 'name', 'createdAt'],
+      include: [
+        {
+          model: this.eventWorkshop,
+          attributes: ['id', 'start', 'end', 'eventId', 'name', 'createdAt'],
+          required: true,
+          where: {
+            start: { [Op.gt]: startDate}
+          }
+        }
+      ],
+      order: [
+        ['workshops', 'id', 'asc']
+      ]
+    })
   }
 }
